@@ -112,7 +112,7 @@ export default function Home() {
       });
 
       if (!res.ok) {
-        throw new Error("Failed to get prediction from server");
+        throw new Error("Failed to get prediction from server (HTTP " + res.status + ")");
       }
 
       const data = await res.json();
@@ -121,7 +121,11 @@ export default function Home() {
       }
       setResult(data);
     } catch (err: any) {
-      setError(err.message || "An unexpected error occurred");
+      if (err.message?.includes("fetch") || err.name === "TypeError") {
+        setError("Cannot connect to backend server. Please make sure the backend is running on http://localhost:8000");
+      } else {
+        setError(err.message || "An unexpected error occurred");
+      }
     } finally {
       setLoading(false);
     }
